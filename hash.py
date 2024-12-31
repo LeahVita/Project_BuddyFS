@@ -1,6 +1,7 @@
 import os
 import hashlib
 import argparse
+from natsort import natsorted
 
 
 def compute_file_hash(filepath, hash_algorithm='sha256'):
@@ -13,13 +14,14 @@ def compute_file_hash(filepath, hash_algorithm='sha256'):
 
 def read_bin_files_and_compute_hashes(input_dir, hash_algorithm='sha256'):
     bin_files_hashes = {}
-    for file_name in os.listdir(input_dir):
-        if file_name.endswith('.bin'):
-            file_path = os.path.join(input_dir, file_name)
-            file_hash = compute_file_hash(file_path, hash_algorithm)
-            bin_files_hashes[file_name] = file_hash
-    return bin_files_hashes
+    bin_files = [file_name for file_name in os.listdir(input_dir) if file_name.endswith('.bin')]
+    bin_files = natsorted(bin_files)
 
+    for file_name in bin_files:
+        file_path = os.path.join(input_dir, file_name)
+        file_hash = compute_file_hash(file_path, hash_algorithm)
+        bin_files_hashes[file_name] = file_hash
+    return bin_files_hashes
 
 def main():
     parser = argparse.ArgumentParser(description="Compute hash values of .bin files in a directory.")
